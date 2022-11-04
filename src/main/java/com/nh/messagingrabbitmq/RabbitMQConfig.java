@@ -16,17 +16,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${queue.name}")
-    private String queueName;
-    final String topicExchangeName = "spring-boot-exchange";
+
+    private String queueName="keycloak";
+    final String topicExchangeName = "amq.topic";
     private final String localhost = "localhost";
     private final String username = "guest";
     private final String password = "guest";
 
-    @Bean
-    RabbitTemplate template() {
-        return new RabbitTemplate();
-    }
 
     @Bean
     Queue queue() {
@@ -40,23 +36,9 @@ public class RabbitMQConfig {
 
     @Bean
     Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("routing.key.#");
+        return BindingBuilder.bind(queue).to(exchange).with("KK.EVENT.#");
     }
 
-    @Bean
-    SimpleMessageListenerContainer container(ConnectionFactory connectionFactory,
-                                             MessageListenerAdapter listenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(queueName);
-        container.setMessageListener(listenerAdapter);
-        return container;
-    }
-
-    @Bean
-    MessageListenerAdapter listenerAdapter(Receiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveMessage");
-    }
 
     @Bean
     public ConnectionFactory connectionFactory() {
